@@ -66,6 +66,11 @@ public class GameService {
         }
 
         int[][] board = game.getBoard();
+        
+        if (checkStarted(board) == false && gamePlay.getType().getValue() == 2) {
+			throw new InvalidGameException("Invalid start..Very first time should starts with 'X'");
+		}
+        
         board[gamePlay.getCoordinateX()][gamePlay.getCoordinateY()] = gamePlay.getType().getValue();
         
         
@@ -108,4 +113,15 @@ public class GameService {
         }
         return false;
     }
+    
+    private Boolean checkStarted(int[][] board) {
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				if (board[i][j] == 1 | board[i][j] == 2) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }
