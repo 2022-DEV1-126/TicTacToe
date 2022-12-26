@@ -68,11 +68,20 @@ public class GameService {
         int[][] board = game.getBoard();
         
         if (checkStarted(board) == false && gamePlay.getType().getValue() == 2) {
-			throw new InvalidGameException("Invalid start..Very first time should starts with 'X'");
+		throw new InvalidGameException("Invalid start..Very first time should starts with 'X'");
+	}
+	    
+	if (typesCount(board) == 1 && gamePlay.getType().getValue() == 1) {
+		throw new InvalidGameException("Invalid turn..Should take 'O' turn");
+	} else if (typesCount(board) == 0 && gamePlay.getType().getValue() == 2) {
+		throw new InvalidGameException("Invalid turn..Should take 'X' turn");
+	} else {
+		if(board[gamePlay.getCoordinateX()][gamePlay.getCoordinateY()] == 1 || board[gamePlay.getCoordinateX()][gamePlay.getCoordinateY()] == 2) {
+			throw new InvalidGameException("Value already existed in this place");
+		}else {
+			board[gamePlay.getCoordinateX()][gamePlay.getCoordinateY()] = gamePlay.getType().getValue();
 		}
-        
-        board[gamePlay.getCoordinateX()][gamePlay.getCoordinateY()] = gamePlay.getType().getValue();
-        
+	}
         
         Boolean xWinner = checkWinner(game.getBoard(), TicToe.X);
         Boolean oWinner = checkWinner(game.getBoard(), TicToe.O);
@@ -83,7 +92,9 @@ public class GameService {
         } else if (oWinner) {
         	game.setStatus(FINISHED);
             game.setWinner(TicToe.O);
-        }
+        } else if(isGameEndWithDraw(board)) {
+		game.setStatus(FINISHED);
+	}
 
         GameStorage.getInstance().setGame(game);
         return game;
@@ -115,13 +126,44 @@ public class GameService {
     }
     
     private Boolean checkStarted(int[][] board) {
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
-				if (board[i][j] == 1 | board[i][j] == 2) {
-					return true;
-				}
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			if (board[i][j] == 1 | board[i][j] == 2) {
+				return true;
 			}
 		}
-		return false;
 	}
+	return false;
+     }
+	
+    private int typesCount(int[][] board) {
+	int count = 0;
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			if (board[i][j] == 1) {
+				count++;
+			} else if (board[i][j] == 2) {
+				count--;
+			}
+
+		}
+	}
+
+	return count;
+     }
+	
+     private Boolean isGameEndWithDraw(int[][] board) {
+	boolean endGame = true;
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			if (board[i][j] == 0) {
+				i =3;
+				endGame = false;
+				break;
+			} 
+		}
+	}
+
+	return endGame;
+     }
 }
